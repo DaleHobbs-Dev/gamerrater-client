@@ -13,14 +13,14 @@ export const Login = () => {
         e.preventDefault()
         fetch(`${API_BASE_URL}/login`, {
             method: "POST",
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username: email, password }),
             headers: {
                 "Content-Type": "application/json"
             }
         })
             .then(res => res.json())
             .then(authInfo => {
-                if (authInfo.valid) {
+                if (authInfo.token) {
                     localStorage.setItem("gamer_rater_token", JSON.stringify(authInfo))
                     navigate("/")
                 } else {
@@ -31,9 +31,14 @@ export const Login = () => {
 
     return (
         <main className="container--login">
-            <dialog className="dialog dialog--auth" ref={existDialog}>
-                <div>User does not exist</div>
-                <button className="button--close" onClick={() => existDialog.current.close()}>Close</button>
+            <dialog className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl p-8 w-80 text-center backdrop:bg-black/40" ref={existDialog}>
+                <p className="text-red-600 text-lg font-semibold mb-2">Login Failed</p>
+                <p className="text-gray-600 text-sm mb-6">No account found with those credentials.</p>
+                <button
+                    className="px-4 py-2 bg-blue-800 text-white text-sm rounded-md hover:bg-blue-700"
+                    onClick={() => existDialog.current.close()}>
+                    Close
+                </button>
             </dialog>
 
             <section>
