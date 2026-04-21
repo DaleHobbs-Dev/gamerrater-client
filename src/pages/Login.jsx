@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../services";
+import { API_BASE_URL, TOKEN_KEY } from "../services";
 import "./Login.css"
 
 export const Login = () => {
@@ -21,7 +21,7 @@ export const Login = () => {
             .then(res => res.json())
             .then(authInfo => {
                 if (authInfo.token) {
-                    localStorage.setItem("gamer_rater_token", JSON.stringify(authInfo))
+                    localStorage.setItem(TOKEN_KEY, JSON.stringify(authInfo))
                     navigate("/")
                 } else {
                     existDialog.current.showModal()

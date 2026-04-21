@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../services";
+import { API_BASE_URL, TOKEN_KEY } from "../services";
 import "./Login.css"
 
 const PASSWORD_REQUIREMENTS = [
@@ -44,7 +44,7 @@ export const Register = () => {
             .then(res => res.json())
             .then(authInfo => {
                 if (authInfo && authInfo.token) {
-                    localStorage.setItem("gamer_rater_token", JSON.stringify(authInfo))
+                    localStorage.setItem(TOKEN_KEY, JSON.stringify(authInfo))
                     navigate("/")
                 } else if (authInfo && authInfo.password) {
                     setBackendErrors(authInfo.password)
