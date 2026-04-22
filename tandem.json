@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "config": {
+    "understandingChecks": true
+  },
+  "docs": [
+    {
+      "path": "dev-docs/PRD.md",
+      "scope": "general",
+      "purpose": "Product requirements, target users, tech stack decisions, and project scope for the GamerRater client",
+      "tags": ["prd", "requirements", "scope", "stack"]
+    },
+    {
+      "path": "dev-docs/ARCHITECTURE.md",
+      "scope": "general",
+      "purpose": "System design, codebase map, component breakdown, API design, current state, and migration path",
+      "tags": ["architecture", "system-design", "conventions", "data-model"]
+    },
+    {
+      "path": "dev-docs/ERD.dbml",
+      "scope": "database",
+      "purpose": "Entity relationship diagram for the GamerRater backend database schema",
+      "tags": ["data-model", "schema", "erd"]
+    },
+    {
+      "path": "dev-docs/ROADMAP.md",
+      "scope": "general",
+      "purpose": "Ordered implementation steps with checkboxes and user stories for the GamerRater client",
+      "tags": ["roadmap", "planning"]
+    }
+  ]
+}
