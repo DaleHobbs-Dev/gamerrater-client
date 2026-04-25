@@ -25,7 +25,7 @@ Generated from: dev-docs/PRD.md
   - As a logged-in player, I want the app to know who I am so that I see
     content and controls appropriate for my account.
 
-- [ ] **Step 3: Add logout**
+- [x] **Step 3: Add logout**
   Add a logout button to the NavBar. On click, clear the token from
   localStorage, clear the user context, and redirect to `/login`. This
   completes the full auth lifecycle (register, login, logout) and depends on

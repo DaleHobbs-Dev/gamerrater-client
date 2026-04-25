@@ -1,8 +1,9 @@
 import { NavLink, Link, useNavigate } from "react-router-dom"
-import { TOKEN_KEY } from "../services"
+import { useUser } from "../contexts/UserContext"
 
 export const NavBar = () => {
     const navigate = useNavigate()
+    const { user, logout } = useUser()
 
     const navLinkClass = ({ isActive }) =>
         `text-sm font-medium transition-colors ${
@@ -21,14 +22,14 @@ export const NavBar = () => {
             </Link>
 
             <div className="flex items-center gap-8">
-                {localStorage.getItem(TOKEN_KEY) !== null ? (
+                {user ? (
                     <>
                         <NavLink to="/games" className={navLinkClass}>
                             Games
                         </NavLink>
                         <button
                             onClick={() => {
-                                localStorage.removeItem(TOKEN_KEY)
+                                logout()
                                 navigate("/login")
                             }}
                             className="text-sm font-medium text-primary-100 hover:text-accent-500 transition-colors"
