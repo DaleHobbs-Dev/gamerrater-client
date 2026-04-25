@@ -95,6 +95,12 @@ export const GameDetail = () => {
                             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Age Recommendation</p>
                             <p className="text-gray-900 font-medium">{game.age_recommendation}+</p>
                         </div>
+                        <div>
+                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Average Rating</p>
+                            <p className="text-gray-900 font-medium">
+                                {game.average_rating != null ? `${game.average_rating} / 10` : "No ratings yet"}
+                            </p>
+                        </div>
                     </div>
 
                     {game.categories?.length > 0 && (

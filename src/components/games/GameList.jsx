@@ -94,6 +94,20 @@ export const GameList = () => {
                                             ))}
                                         </div>
                                     )}
+                                    <div className="flex gap-6 mt-3 pt-3 border-t border-gray-100">
+                                        <div>
+                                            <p className="text-xs text-gray-400 uppercase tracking-wide">Average Rating</p>
+                                            <p className="text-sm text-gray-900 font-medium">
+                                                {game.average_rating != null ? `${game.average_rating} / 10` : "—"}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-400 uppercase tracking-wide">Your Rating</p>
+                                            <p className="text-sm text-gray-900 font-medium">
+                                                {game.my_rating != null ? `${game.my_rating} / 10` : "—"}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </Card>
                         ))}
