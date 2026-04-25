@@ -1,5 +1,5 @@
-<!-- Last updated: 2026-04-21 -->
-<!-- Last change: Initial roadmap creation -->
+<!-- Last updated: 2026-04-25 -->
+<!-- Last change: Insert reviewing step before search/filter; add sub-steps to both; remove duplicate ratings step -->
 
 # GamerRater Client - Implementation Roadmap
 
@@ -36,40 +36,35 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to log out so that my session ends and my account
     is no longer accessible on this device.
 
-- [ ] **Step 4: Add search, category filter, and sort to GameList**
-  Add a filter bar above the game grid on `/games`. Players can type a search
-  term, pick a category, and choose a sort order (year released). These values
-  are sent to the backend as query parameters (`?search=&category=&sort=`)
-  rather than filtering the local array. Update `gameService.getGames()` to
-  accept an options object and append query params to the request URL.
+- [ ] **Step 4: Add ratings, reviews, and review form**
+  When a player views a game, they can submit a numeric rating (1-10) and a
+  written review. A "Review Game" button on the GameDetail page links to
+  `/games/:id/review`, which renders a `ReviewForm` component. On submit, the
+  form POSTs to the `gameratings` endpoint. After saving, the player is
+  redirected back to the game. Existing reviews are displayed below the game
+  details on the GameDetail page.
 
-  **User Stories:**
+  **API:**
+  - `POST /gameratings` with `{ game, rating, review }` to create a rating and review
+  - `GET /gameratings?game=<id>` to fetch all ratings and reviews for a game
 
-  - As a player, I want to search for a game by name so that I can find it
-    quickly without scrolling through the full list.
-  - As a player, I want to filter games by category so that I can browse games
-    in a genre I enjoy.
-  - As a player, I want to sort games by year released so that I can find
-    newer or older games.
+  **Example POST body:**
 
-- [ ] **Step 5: Switch GameList to backend-driven pagination**
-  Replace the current client-side pagination (local array slicing) with backend
-  pagination. Django will return a paginated response (e.g. `{count, results}`)
-  and the client will send a `page` query parameter. The `Pagination` component
-  stays, but it is now driven by the API response instead of a local slice.
-  This builds directly on step 4 since query params are already in place.
+  ```json
+  {
+    "game": 6,
+    "rating": 9,
+    "review": "One of the most elegant games I have ever played. Easy to learn but deeply strategic."
+  }
+  ```
 
-  **User Stories:**
-
-  - As a player, I want the games list to load quickly even as the catalog
-    grows, without the app fetching every game at once.
-
-- [ ] **Step 6: Add ratings and reviews**
-  Add a ratings and reviews section to the GameDetail page. A logged-in player
-  can submit a numeric rating and a written review for a game. Each player can
-  only submit one rating per game (enforced by the backend). Display all
-  existing reviews below the game details. Add a `ratingService.js` with
-  functions for creating and fetching ratings.
+  **Sub-steps:**
+  1. Add `ratingService.js` with `createRating(data)` and `getGameRatings(gameId)`
+  2. Build `ReviewForm` component at `src/components/games/ReviewForm.jsx` with a
+     rating input (1-10) and a review textarea
+  3. Add the `/games/:id/review` route to `ApplicationViews`
+  4. Update `GameDetail` to show a "Review Game" button and display the list of
+     reviews below the game details
 
   **User Stories:**
 
@@ -80,10 +75,53 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to read other players' reviews of a game so that I
     can decide if I want to play it.
 
+- [ ] **Step 5: Add search, category filter, and sort to GameList**
+  Add a filter bar above the game grid on `/games`. Players can type a search
+  term, pick a category, and choose a sort order (year released). These values
+  are sent to the backend as query parameters (`?search=&category=&sort=`)
+  rather than filtering the local array. Update `gameService.getGames()` to
+  accept an options object and append query params to the request URL.
+
+  **Sub-steps:**
+  1. Update `gameService.getGames()` to accept a `params` object and build a
+     query string using the browser's built-in `URLSearchParams`. Only include
+     params that have a value so the URL stays clean.
+  2. Add two filter states to `GameList`: `searchText` (the controlled input
+     value) and `filters` (an object `{ search, category, sort }` that actually
+     drives the fetch). These are separate so search only fires on submit, not
+     on every keystroke.
+  3. Fetch categories on mount (separate `useEffect` with `[]` dependency) to
+     populate the category dropdown.
+  4. Update the games `useEffect` to depend on `[filters]` so it re-fetches
+     when filters change, and reset `currentPage` to 1 on each change.
+  5. Add the filter bar UI above the game grid using `Input`, `Select`, and
+     `Button` components.
+
+  **User Stories:**
+
+  - As a player, I want to search for a game by name so that I can find it
+    quickly without scrolling through the full list.
+  - As a player, I want to filter games by category so that I can browse games
+    in a genre I enjoy.
+  - As a player, I want to sort games by year released so that I can find
+    newer or older games.
+
+- [ ] **Step 6: Switch GameList to backend-driven pagination**
+  Replace the current client-side pagination (local array slicing) with backend
+  pagination. Django will return a paginated response (e.g. `{count, results}`)
+  and the client will send a `page` query parameter. The `Pagination` component
+  stays, but it is now driven by the API response instead of a local slice.
+  This builds directly on step 5 since query params are already in place.
+
+  **User Stories:**
+
+  - As a player, I want the games list to load quickly even as the catalog
+    grows, without the app fetching every game at once.
+
 - [ ] **Step 7: Add average rating display**
   Show the average rating for each game on both the GameDetail page and the
   GameList cards. The backend computes this as a custom model property and
-  includes it in the game response. This step depends on step 6 so that
+  includes it in the game response. This step depends on step 4 so that
   there is real rating data to display.
 
   **User Stories:**
