@@ -5,3 +5,6 @@ export { API_BASE_URL, TOKEN_KEY, fetchJSON, postJSON, patchJSON } from "./api.c
 
 // User service
 export { getUserProfile } from "./userService"
+
+// Game Rating service
+export { getRatingsByGameId, createRating, updateRating } from "./ratingService"

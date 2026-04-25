@@ -36,7 +36,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to log out so that my session ends and my account
     is no longer accessible on this device.
 
-- [ ] **Step 4: Add ratings, reviews, and review form**
+- [x] **Step 4: Add ratings, reviews, and review form**
   When a player views a game, they can submit a numeric rating (1-10) and a
   written review. A "Review Game" button on the GameDetail page links to
   `/games/:id/review`, which renders a `ReviewForm` component. On submit, the
@@ -142,6 +142,20 @@ Generated from: dev-docs/PRD.md
     others can see what the game looks like.
   - As a player, I want to upload a photo I took of the game rather than
     finding a URL, so that I can use my own images.
+
+- [ ] **Step 10: Build player profile page**
+  When a player's name appears on a review, it links to `/player/:id`. Build the
+  `PlayerDetail` component at `src/components/players/PlayerDetail.jsx` to display
+  public profile information for that player. This requires a backend endpoint
+  (`GET /players/:id`) that returns public data for any player by id -- not just
+  the current user. The `/me` endpoint is not sufficient here.
+
+  **User Stories:**
+
+  - As a player, I want to click a reviewer's name and see their public profile
+    so that I can learn more about their taste in games.
+  - As a player, I want my public profile to show how many games I have reviewed,
+    which games I have played, and any favorites I have listed.
 
 - [ ] **Step 9: Build category management pages**
   Add pages for creating and editing categories, accessible only to players
