@@ -1,13 +1,16 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { API_BASE_URL, TOKEN_KEY } from "../services"
+import { getUserProfile } from "../services/userService"
 import { AuthCard, FormField, Input, Button, Alert } from "../components/ui"
+import { useUser } from "../contexts/UserContext"
 
 export const Login = () => {
     const [email, setEmail] = useState("steve@brownlee.com")
     const [password, setPassword] = useState("brownlee")
     const [error, setError] = useState(null)
     const navigate = useNavigate()
+    const { setUser } = useUser()
 
     const handleLogin = (e) => {
         e.preventDefault()
@@ -21,9 +24,15 @@ export const Login = () => {
             .then(authInfo => {
                 if (authInfo.token) {
                     localStorage.setItem(TOKEN_KEY, JSON.stringify(authInfo))
-                    navigate("/")
+                    return getUserProfile()
                 } else {
                     setError("No account found with those credentials.")
+                }
+            })
+            .then(profile => {
+                if (profile) {
+                    setUser(profile)
+                    navigate("/")
                 }
             })
             .catch(() => setError("Something went wrong. Please try again."))

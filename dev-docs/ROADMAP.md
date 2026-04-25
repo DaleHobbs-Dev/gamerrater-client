@@ -13,7 +13,7 @@ Generated from: dev-docs/PRD.md
   a consistent visual style. No new functionality -- this is a cleanup step that
   sets a clean baseline for everything that follows.
 
-- [ ] **Step 2: Set up user context with the /me endpoint**
+- [x] **Step 2: Set up user context with the /me endpoint**
   Create a React context (`UserContext`) that fetches `/me` after login and
   stores the current user object (including `is_staff`) app-wide. Components
   will read from this context instead of checking localStorage directly. This
