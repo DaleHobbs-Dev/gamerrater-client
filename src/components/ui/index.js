@@ -14,3 +14,4 @@ export { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from ".
 export { Textarea } from "./Textarea"
 export { Pagination } from "./Pagination"
 export { LoadingPage } from "./LoadingPage"
+export { Modal } from "./Modal"

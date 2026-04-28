@@ -1,5 +1,5 @@
-<!-- Last updated: 2026-04-25 -->
-<!-- Last change: Insert reviewing step before search/filter; add sub-steps to both; remove duplicate ratings step -->
+<!-- Last updated: 2026-04-27 -->
+<!-- Last change: Add completed step 5 for action picture gallery; renumber steps 5-10 to 6-11 -->
 
 # GamerRater Client - Implementation Roadmap
 
@@ -75,7 +75,30 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to read other players' reviews of a game so that I
     can decide if I want to play it.
 
-- [ ] **Step 5: Add search, category filter, and sort to GameList**
+- [x] **Step 5: Add action picture gallery to GameDetail**
+  Players can upload photos of a game being played directly from the GameDetail
+  page. Uploaded images are stored via the `/gamepictures` endpoint as base64
+  strings. The gallery displays thumbnails below the game details, each clickable
+  to open a full-size preview modal. Players who uploaded an image, or admins,
+  see a "Delete" button inside the preview with a confirmation step before
+  deletion. A reusable `Modal` component was added to the UI library as part
+  of this step.
+
+  **API:**
+  - `GET /gamepictures?game=<id>` to fetch all pictures for a game
+  - `POST /gamepictures` with `{ game, action_pic }` (base64 string) to upload
+  - `DELETE /gamepictures/:id` to remove a picture
+
+  **User Stories:**
+
+  - As a player, I want to upload action photos of a game so others can see it
+    being played.
+  - As a player, I want to delete a picture I uploaded if I no longer want it
+    shown.
+  - As an admin, I want to be able to remove any inappropriate picture from any
+    game's gallery.
+
+- [ ] **Step 6: Add search, category filter, and sort to GameList**
   Add a filter bar above the game grid on `/games`. Players can type a search
   term, pick a category, and choose a sort order (year released). These values
   are sent to the backend as query parameters (`?search=&category=&sort=`)
@@ -106,7 +129,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to sort games by year released so that I can find
     newer or older games.
 
-- [ ] **Step 6: Switch GameList to backend-driven pagination**
+- [ ] **Step 7: Switch GameList to backend-driven pagination**
   Replace the current client-side pagination (local array slicing) with backend
   pagination. Django will return a paginated response (e.g. `{count, results}`)
   and the client will send a `page` query parameter. The `Pagination` component
@@ -118,7 +141,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want the games list to load quickly even as the catalog
     grows, without the app fetching every game at once.
 
-- [ ] **Step 7: Add average rating display**
+- [ ] **Step 8: Add average rating display**
   Show the average rating for each game on both the GameDetail page and the
   GameList cards. The backend computes this as a custom model property and
   includes it in the game response. This step depends on step 4 so that
@@ -129,7 +152,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to see the average rating for a game at a glance so
     that I can quickly gauge how well-regarded it is.
 
-- [ ] **Step 8: Add picture upload to GameForm**
+- [ ] **Step 9: Add picture upload to GameForm**
   Add a picture section to the game create and edit form. Players can attach
   a picture by entering an image URL or by uploading an image file from their
   device. Uploaded files are sent to the backend via a multipart form request
@@ -143,7 +166,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want to upload a photo I took of the game rather than
     finding a URL, so that I can use my own images.
 
-- [ ] **Step 10: Build player profile page**
+- [ ] **Step 11: Build player profile page**
   When a player's name appears on a review, it links to `/player/:id`. Build the
   `PlayerDetail` component at `src/components/players/PlayerDetail.jsx` to display
   public profile information for that player. This requires a backend endpoint
@@ -157,7 +180,7 @@ Generated from: dev-docs/PRD.md
   - As a player, I want my public profile to show how many games I have reviewed,
     which games I have played, and any favorites I have listed.
 
-- [ ] **Step 9: Build category management pages**
+- [ ] **Step 10: Build category management pages**
   Add pages for creating and editing categories, accessible only to players
   where `is_staff` is true. Add the routes to `ApplicationViews`, protect
   them with an admin check using the user context from step 2, and add nav

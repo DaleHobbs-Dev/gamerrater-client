@@ -1,5 +1,5 @@
-<!-- Last updated: 2026-04-21 -->
-<!-- Last change: Initial architecture document -->
+<!-- Last updated: 2026-04-27 -->
+<!-- Last change: Update API table, current state, and target state to reflect steps 1-5 complete -->
 
 # GamerRater Client - Technical Architecture
 
@@ -116,24 +116,29 @@ Key things to understand from the client's perspective:
 
 ### Currently Used
 
-| Method | Endpoint         | Purpose                     |
-|--------|------------------|-----------------------------|
-| POST   | /login           | Auth, returns token         |
-| GET    | /games           | Fetch all games             |
-| GET    | /games/:id       | Fetch single game           |
-| POST   | /games           | Create a game               |
-| PATCH  | /games/:id       | Update a game               |
-| GET    | /categories      | Fetch all categories        |
+| Method | Endpoint              | Purpose                              |
+|--------|-----------------------|--------------------------------------|
+| POST   | /login                | Auth, returns token                  |
+| GET    | /me                   | Fetch current user profile           |
+| GET    | /games                | Fetch all games                      |
+| GET    | /games/:id            | Fetch single game                    |
+| POST   | /games                | Create a game                        |
+| PATCH  | /games/:id            | Update a game                        |
+| GET    | /categories           | Fetch all categories                 |
+| GET    | /gameratings?game=:id | Fetch all ratings/reviews for a game |
+| POST   | /gameratings          | Submit a rating and review           |
+| GET    | /gamepictures?game=:id| Fetch all action pictures for a game |
+| POST   | /gamepictures         | Upload an action picture (base64)    |
+| DELETE | /gamepictures/:id     | Delete an action picture             |
 
 ### Planned
 
 | Method | Endpoint                       | Purpose                          |
 |--------|--------------------------------|----------------------------------|
 | GET    | /games?search=&category=&sort= | Filtered/sorted game list        |
-| POST   | /games/:id/ratings             | Create or update rating + review |
-| POST   | /games/:id/pictures            | Upload picture (URL or file)     |
 | POST   | /categories                    | Create category (admin only)     |
 | PATCH  | /categories/:id                | Update category (admin only)     |
+| GET    | /players/:id                   | Fetch public profile for a player|
 
 All requests attach an `Authorization: Token <token>` header, read from
 localStorage via `getAuthHeader()` in `api.config.js`.
@@ -168,12 +173,16 @@ localStorage via `getAuthHeader()` in `api.config.js`.
 
 ## Current State (What Is Built)
 
-- Auth: Login and Register pages (functional, using legacy CSS)
+- Auth: Login, Register, Logout -- full auth lifecycle complete
 - `Authorized` route guard with NavBar/Footer layout shell
+- User context (`UserContext`) with `/me` integration -- `is_staff` available app-wide
 - Full game CRUD: list, detail, create, edit
-- `is_owner` edit button shown only to the game creator
-- Shared UI component library (15 components)
-- Services layer with `fetchJSON`, `postJSON`, `patchJSON`, `deleteJSON`
+- Average rating and current user's rating displayed on GameList cards and GameDetail
+- Ratings and reviews: `ReviewForm` at `/games/:id/review`, review list on `GameDetail`
+- Action picture gallery on `GameDetail`: upload (base64), thumbnail grid, full preview modal, delete with confirmation (owner or admin only)
+- Placeholder `PlayerDetail` component and `/player/:id` route
+- Shared UI component library (16 components, including `Modal`)
+- Services layer: `gameService`, `categoryService`, `ratingService`, `pictureService`
 
 ---
 
@@ -181,13 +190,11 @@ localStorage via `getAuthHeader()` in `api.config.js`.
 
 Listed roughly in dependency order:
 
-1. Migrate Login and Register to use the shared UI library
-2. Add logout (clear token, redirect to /login)
-3. Add search, category filter, and sort to GameList (query params)
-4. Add ratings and reviews (form + display on GameDetail)
-5. Add picture upload to GameForm (URL input + file upload field)
-6. Add average rating display on GameDetail and GameList cards
-7. Add category management pages (create/edit), protected for admin users
+1. Add search, category filter, and sort to GameList (query params)
+2. Switch GameList to backend-driven pagination
+3. Add picture upload to GameForm (game's main image, URL or file)
+4. Build player profile page -- requires `GET /players/:id` backend endpoint
+5. Add category management pages (create/edit), protected for admin users
 
 ---
 
