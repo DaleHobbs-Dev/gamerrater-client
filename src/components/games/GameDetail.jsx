@@ -16,6 +16,8 @@ export const GameDetail = () => {
     const [error, setError] = useState(null)
     const [reviews, setReviews] = useState([])
     const [reviewsLoading, setReviewsLoading] = useState(true)
+    const [reviewSearchText, setReviewSearchText] = useState("")
+    const [appliedReviewSearch, setAppliedReviewSearch] = useState("")
     const [pictures, setPictures] = useState([])
     const [picturesLoading, setPicturesLoading] = useState(true)
     const [showUploadModal, setShowUploadModal] = useState(false)
@@ -46,7 +48,8 @@ export const GameDetail = () => {
     // Fetch reviews for the game
     useEffect(() => {
         let mounted = true
-        getRatingsByGameId(id)
+        setReviewsLoading(true)
+        getRatingsByGameId(id, appliedReviewSearch)
             .then(data => {
                 if (!mounted) return
                 setReviews(data)
@@ -57,7 +60,7 @@ export const GameDetail = () => {
                 setReviewsLoading(false)
             })
         return () => { mounted = false }
-    }, [id])
+    }, [id, appliedReviewSearch])
 
     useEffect(() => {
         let mounted = true
@@ -117,6 +120,16 @@ export const GameDetail = () => {
             .catch(() => setDeleting(false))
     }
 
+    const handleReviewSearchSubmit = (e) => {
+        e.preventDefault()
+        setAppliedReviewSearch(reviewSearchText)
+    }
+
+    const handleClearReviewSearch = () => {
+        setReviewSearchText("")
+        setAppliedReviewSearch("")
+    }
+
     if (loading) return <LoadingPage />
 
     if (error) {
@@ -148,39 +161,50 @@ export const GameDetail = () => {
 
             <Card className="max-w-2xl">
                 <CardContent>
-                    <p className="text-gray-700 leading-relaxed">{game.description}</p>
+                    <div className="flex gap-6">
+                        {game.game_image && (
+                            <img
+                                src={game.game_image}
+                                alt={game.title}
+                                className="w-44 rounded-md object-cover self-start flex-shrink-0"
+                            />
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <p className="text-gray-700 leading-relaxed">{game.description}</p>
 
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 mt-6 pt-4 border-t border-gray-100">
-                        <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Players</p>
-                            <p className="text-gray-900 font-medium">{game.num_players}</p>
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Time to Play</p>
-                            <p className="text-gray-900 font-medium">~{game.time_to_play} min</p>
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Age Recommendation</p>
-                            <p className="text-gray-900 font-medium">{game.age_recommendation}+</p>
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Average Rating</p>
-                            <p className="text-gray-900 font-medium">
-                                {game.average_rating != null ? `${game.average_rating} / 10` : "No ratings yet"}
-                            </p>
+                            <div className="grid grid-cols-2 gap-y-4 gap-x-8 mt-6 pt-4 border-t border-gray-100">
+                                <div>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Players</p>
+                                    <p className="text-gray-900 font-medium">{game.num_players}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Time to Play</p>
+                                    <p className="text-gray-900 font-medium">~{game.time_to_play} min</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Age Recommendation</p>
+                                    <p className="text-gray-900 font-medium">{game.age_recommendation}+</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Average Rating</p>
+                                    <p className="text-gray-900 font-medium">
+                                        {game.average_rating != null ? `${game.average_rating} / 10` : "No ratings yet"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {game.categories?.length > 0 && (
+                                <div className="mt-6 pt-4 border-t border-gray-100">
+                                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Categories</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {game.categories.map(cat => (
+                                            <Badge key={cat.id} variant="blue">{cat.name}</Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-
-                    {game.categories?.length > 0 && (
-                        <div className="mt-6 pt-4 border-t border-gray-100">
-                            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Categories</p>
-                            <div className="flex flex-wrap gap-2">
-                                {game.categories.map(cat => (
-                                    <Badge key={cat.id} variant="blue">{cat.name}</Badge>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </CardContent>
             </Card>
 
@@ -220,12 +244,19 @@ export const GameDetail = () => {
             <div className="mt-10 max-w-2xl">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviews</h2>
 
-                <div className="mb-5">
+                <form onSubmit={handleReviewSearchSubmit} className="flex gap-2 mb-5">
                     <Input
-                        placeholder="Search reviews... (coming soon)"
-                        disabled
+                        value={reviewSearchText}
+                        onChange={e => setReviewSearchText(e.target.value)}
+                        placeholder="Search reviews..."
                     />
-                </div>
+                    <Button type="submit">Search</Button>
+                    {appliedReviewSearch && (
+                        <Button type="button" variant="ghost" onClick={handleClearReviewSearch}>
+                            Clear
+                        </Button>
+                    )}
+                </form>
 
                 {reviewsLoading ? (
                     <div className="flex items-center gap-2">
@@ -233,7 +264,11 @@ export const GameDetail = () => {
                         <span className="text-sm text-gray-500">Loading reviews...</span>
                     </div>
                 ) : reviews.length === 0 ? (
-                    <Alert variant="info">No reviews yet. Be the first to review this game!</Alert>
+                    <Alert variant="info">
+                        {appliedReviewSearch
+                            ? `No reviews found matching "${appliedReviewSearch}".`
+                            : "No reviews yet. Be the first to review this game!"}
+                    </Alert>
                 ) : (
                     <div className="flex flex-col gap-4">
                         {reviews.map(r => (

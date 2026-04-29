@@ -26,6 +26,8 @@ export const GameForm = () => {
     const [timeToPlay, setTimeToPlay] = useState("")
     const [ageRecommendation, setAgeRecommendation] = useState("")
     const [selectedCategories, setSelectedCategories] = useState([])
+    const [gameImageUrl, setGameImageUrl] = useState("")
+    const [bggId, setBggId] = useState("")
 
     useEffect(() => {
         let mounted = true
@@ -51,6 +53,8 @@ export const GameForm = () => {
                     setTimeToPlay(String(game.time_to_play))
                     setAgeRecommendation(String(game.age_recommendation))
                     setSelectedCategories(game.categories.map(c => c.id))
+                    setGameImageUrl(game.game_image || "")
+                    setBggId(game.bgg_id != null ? String(game.bgg_id) : "")
                     setLoadingGame(false)
                 }
             } catch (err) {
@@ -85,6 +89,8 @@ export const GameForm = () => {
             time_to_play: parseInt(timeToPlay),
             age_recommendation: parseInt(ageRecommendation),
             categories: selectedCategories,
+            game_image: gameImageUrl || null,
+            bgg_id: bggId ? parseInt(bggId) : null,
         }
 
         const request = isEditMode ? updateGame(id, gameData) : createGame(gameData)
@@ -129,6 +135,15 @@ export const GameForm = () => {
                                 placeholder="Brief description of the game"
                                 rows={3}
                                 required
+                            />
+                        </FormField>
+
+                        <FormField label="Game Image URL" htmlFor="gameImageUrl">
+                            <Input
+                                id="gameImageUrl"
+                                value={gameImageUrl}
+                                onChange={e => setGameImageUrl(e.target.value)}
+                                placeholder="https://example.com/image.jpg (optional)"
                             />
                         </FormField>
 
@@ -187,6 +202,19 @@ export const GameForm = () => {
                                 />
                             </FormField>
                         </div>
+
+                        <FormField label="BGG ID" htmlFor="bggId">
+                            <Input
+                                id="bggId"
+                                type="number"
+                                value={bggId}
+                                onChange={e => setBggId(e.target.value)}
+                                placeholder="e.g. 174430 (optional)"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">
+                                Optional. Must match the game's ID on BoardGameGeek.com and be unique.
+                            </p>
+                        </FormField>
 
                         <FormField label="Categories">
                             {loadingCategories ? (

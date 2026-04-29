@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { getGames } from "../../services/gameService"
+import { getCategories } from "../../services/categoryService"
 import {
     Container, PageHeader, Grid, Card, CardHeader, CardTitle, CardContent,
-    Badge, Alert, Button, Pagination, LoadingPage
+    Badge, Alert, Button, Pagination, LoadingPage, Input, Spinner, Select
 } from "../ui"
 
 const GAMES_PER_PAGE = 10
@@ -11,24 +12,50 @@ const GAMES_PER_PAGE = 10
 export const GameList = () => {
     const [games, setGames] = useState([])
     const [loading, setLoading] = useState(true)
+    const [searching, setSearching] = useState(false)
     const [error, setError] = useState(null)
     const [currentPage, setCurrentPage] = useState(1)
+    const [searchText, setSearchText] = useState("")
+    const [appliedSearch, setAppliedSearch] = useState("")
+    const [orderBy, setOrderBy] = useState("")
+    const [direction, setDirection] = useState("asc")
+    const [categories, setCategories] = useState([])
+    const [category, setCategory] = useState("")
 
     useEffect(() => {
         let mounted = true
-        getGames()
+        setSearching(true)
+        getGames({ q: appliedSearch, orderBy, direction, category })
             .then(data => {
                 if (!mounted) return
                 setGames(data)
                 setLoading(false)
+                setSearching(false)
             })
             .catch(err => {
                 if (!mounted) return
                 setError(err.message)
                 setLoading(false)
+                setSearching(false)
             })
         return () => { mounted = false }
+    }, [appliedSearch, orderBy, direction, category])
+
+    useEffect(() => {
+        getCategories().then(setCategories).catch(() => {})
     }, [])
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault()
+        setCurrentPage(1)
+        setAppliedSearch(searchText)
+    }
+
+    const handleClearSearch = () => {
+        setSearchText("")
+        setAppliedSearch("")
+        setCurrentPage(1)
+    }
 
     const totalPages = Math.ceil(games.length / GAMES_PER_PAGE)
     const paginatedGames = games.slice(
@@ -63,8 +90,64 @@ export const GameList = () => {
                 }
             />
 
-            {games.length === 0 ? (
-                <Alert variant="info">No games have been added yet.</Alert>
+            <form onSubmit={handleSearchSubmit} className="flex gap-2 mb-3">
+                <Input
+                    value={searchText}
+                    onChange={e => setSearchText(e.target.value)}
+                    placeholder="Search by title, designer, or description..."
+                />
+                <Button type="submit">Search</Button>
+                {appliedSearch && (
+                    <Button type="button" variant="ghost" onClick={handleClearSearch}>
+                        Clear
+                    </Button>
+                )}
+            </form>
+
+            <div className="flex gap-4 mb-6">
+                <div className="flex-1">
+                    <label className="block text-xs text-gray-500 mb-1">Category</label>
+                    <Select value={category} onChange={e => { setCategory(e.target.value); setCurrentPage(1) }}>
+                        <option value="">All Categories</option>
+                        {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </Select>
+                </div>
+                <div className="flex-1">
+                    <label className="block text-xs text-gray-500 mb-1">Order by</label>
+                    <Select value={orderBy} onChange={e => { setOrderBy(e.target.value); setCurrentPage(1) }}>
+                        <option value="">Default order</option>
+                        <option value="year">Year Released</option>
+                        <option value="time">Time to Play</option>
+                        <option value="designer">Designer</option>
+                        <option value="players">Number of Players</option>
+                    </Select>
+                </div>
+                <div>
+                    <label className="block text-xs text-gray-500 mb-1">Direction</label>
+                    <Select
+                        value={direction}
+                        onChange={e => { setDirection(e.target.value); setCurrentPage(1) }}
+                        disabled={!orderBy}
+                    >
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </Select>
+                </div>
+            </div>
+
+            {searching ? (
+                <div className="flex items-center gap-2 py-8">
+                    <Spinner size="sm" />
+                    <span className="text-sm text-gray-500">Searching...</span>
+                </div>
+            ) : games.length === 0 ? (
+                <Alert variant="info">
+                    {appliedSearch
+                        ? `No games found matching "${appliedSearch}".`
+                        : "No games have been added yet."}
+                </Alert>
             ) : (
                 <>
                     <Grid cols={2}>
@@ -81,6 +164,13 @@ export const GameList = () => {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
+                                    {game.game_image && (
+                                        <img
+                                            src={game.game_image}
+                                            alt={game.title}
+                                            className="w-full h-36 object-cover rounded-md"
+                                        />
+                                    )}
                                     <p className="text-sm text-gray-500">
                                         Designed by {game.designer} &middot; {game.year_released}
                                     </p>
